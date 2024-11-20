@@ -1,10 +1,8 @@
 import streamlit as st
 import torch
 import requests
-from PIL import Image
-from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont
 import numpy as np
-import cv2
 import timm
 from collections import OrderedDict
 from torchvision import transforms
@@ -73,11 +71,13 @@ if uploaded_file:
             predict = model_classify(img_tensor)
             predicted_label = labels[torch.argmax(predict, dim=1).item()]
 
+        # Vẽ bounding box và nhãn lên ảnh
+        draw = ImageDraw.Draw(image)
+        draw.rectangle([xmin, ymin, xmax, ymax], outline="red", width=3)
+        draw.text((xmin, ymin - 15), predicted_label, fill="red")
+
         # Hiển thị kết quả
-        image_np = np.array(image)
-        cv2.rectangle(image_np, (int(xmin), int(ymin)), (int(xmax), int(ymax)), (255, 0, 0), 2)
-        cv2.putText(image_np, predicted_label, (int(xmin), int(ymin) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
-        st.image(image_np, caption=f"Phân loại: {predicted_label}", use_column_width=True)
+        st.image(image, caption=f"Phân loại: {predicted_label}", use_column_width=True)
 
     except Exception as e:
         st.error(f"Lỗi xử lý ảnh: {e}")
