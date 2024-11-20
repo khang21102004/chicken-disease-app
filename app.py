@@ -1,8 +1,6 @@
 import streamlit as st
 import torch
-import requests
-from PIL import Image, ImageDraw, ImageFont
-import numpy as np
+from PIL import Image, ImageDraw
 import timm
 from collections import OrderedDict
 from torchvision import transforms
@@ -71,7 +69,7 @@ if uploaded_file:
             predict = model_classify(img_tensor)
             predicted_label = labels[torch.argmax(predict, dim=1).item()]
 
-        # Vẽ bounding box và nhãn lên ảnh
+        # Vẽ bounding box và nhãn lên ảnh bằng Pillow
         draw = ImageDraw.Draw(image)
         draw.rectangle([xmin, ymin, xmax, ymax], outline="red", width=3)
         draw.text((xmin, ymin - 15), predicted_label, fill="red")
